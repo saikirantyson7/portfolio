@@ -1,3 +1,4 @@
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 
@@ -76,30 +77,167 @@ function Home() {
 
 /* -------------------- EXPERIENCE -------------------- */
 function Experience() {
-  const roles = [
-    { company: "Mphasis", role: "Delivery Project Lead", period: "Sep 2024 – Present", desc: "Leading enterprise cloud delivery, DevOps transformation, CI/CD standardization, and cost optimization." },
-    { company: "Searce Inc", role: "Senior Cloud Engineer", period: "Aug 2022 – Aug 2024", desc: "Designed GCP & AWS architectures, Terraform IaC, Kubernetes platforms, and monitoring." },
-    { company: "Accenture", role: "Senior Analyst", period: "Feb 2021 – Aug 2022", desc: "Executed cloud migrations, CI/CD pipelines, and container platforms." },
-    { company: "BIARCA", role: "System Engineer", period: "Sep 2017 – Feb 2021", desc: "Managed VMware, Linux systems, and CI automation." }
+  const [activeCompany, setActiveCompany] = useState(null);
+
+  const companies = [
+    {
+      name: "Mphasis",
+      role: "Delivery Project Lead",
+      period: "Sep 2024 – Present",
+      projects: [
+        {
+          title: "Enterprise Cloud Transformation Program",
+          responsibilities: [
+            "Led multiple enterprise cloud transformation initiatives on GCP.",
+            "Defined cloud architecture standards, DevOps models, and CI/CD best practices.",
+            "Oversaw Terraform-based infrastructure provisioning and governance.",
+            "Mentored engineers, conducted architecture reviews, and ensured delivery quality.",
+            "Drove FinOps initiatives for cloud cost optimization."
+          ]
+        },
+        {
+          title: "DevOps Platform & Automation",
+          responsibilities: [
+            "Designed standardized CI/CD pipelines using Jenkins and GitHub Actions.",
+            "Implemented automated testing, security scanning, and release strategies.",
+            "Improved deployment reliability and reduced lead time through automation."
+          ]
+        }
+      ]
+    },
+    {
+      name: "Searce Inc",
+      role: "Senior Cloud Engineer",
+      period: "Aug 2022 – Aug 2024",
+      projects: [
+        {
+          title: "GCP Enterprise Landing Zone",
+          responsibilities: [
+            "Designed and implemented secure GCP landing zones using Terraform.",
+            "Configured IAM, Shared VPC, org policies, logging, and monitoring.",
+            "Ensured compliance with enterprise security standards."
+          ]
+        },
+        {
+          title: "Production Kubernetes Platform (GKE)",
+          responsibilities: [
+            "Built and operated production-grade GKE clusters.",
+            "Implemented autoscaling, ingress, CI/CD integration, and monitoring.",
+            "Handled RBAC, secrets management, and cluster upgrades."
+          ]
+        }
+      ]
+    },
+    {
+      name: "Accenture",
+      role: "Digital Tech Developer Senior Analyst",
+      period: "Feb 2021 – Aug 2022",
+      projects: [
+        {
+          title: "Enterprise Cloud Migration",
+          responsibilities: [
+            "Migrated on-premise workloads to cloud using IaC.",
+            "Built Jenkins CI/CD pipelines for application deployments.",
+            "Worked with teams on containerization and performance tuning."
+          ]
+        }
+      ]
+    },
+    {
+      name: "BIARCA",
+      role: "System Engineer / Test Engineer",
+      period: "Sep 2017 – Feb 2021",
+      projects: [
+        {
+          title: "VMware Infrastructure & Test Automation",
+          responsibilities: [
+            "Managed VMware virtualized environments and Linux servers.",
+            "Automated testing frameworks and CI pipelines.",
+            "Improved system reliability and performance monitoring."
+          ]
+        }
+      ]
+    },
+    {
+      name: "Vedams",
+      role: "Associate Software Engineer",
+      period: "Apr 2015 – Aug 2017",
+      projects: [
+        {
+          title: "Application Support & Infrastructure Operations",
+          responsibilities: [
+            "Provided application and infrastructure support for production systems.",
+            "Handled system administration, monitoring, and issue resolution.",
+            "Supported performance optimization and maintenance activities."
+          ]
+        }
+      ]
+    }
   ];
 
   return (
     <section className="min-h-screen px-6 py-20 bg-slate-50">
       <h2 className="section-title">Professional Experience</h2>
-      <div className="grid gap-8 max-w-4xl mx-auto">
-        {roles.map((r, i) => (
-          <motion.div key={i} whileHover={{ scale: 1.02 }}>
-            <Card>
+
+      <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {companies.map((company, i) => (
+          <motion.div
+            key={i}
+            whileHover={{ scale: 1.03 }}
+            className="cursor-pointer"
+            onClick={() => setActiveCompany(company)}
+          >
+            <Card className="rounded-3xl shadow-xl border-0 bg-white hover:shadow-2xl transition">
               <CardContent className="p-8">
-                <h3 className="text-2xl font-semibold">{r.role}</h3>
-                <p className="text-blue-600 font-medium">{r.company}</p>
-                <p className="text-sm text-slate-500 mb-4">{r.period}</p>
-                <p className="text-slate-700">{r.desc}</p>
+                <h3 className="text-2xl font-semibold text-slate-800">{company.name}</h3>
+                <p className="text-blue-600 font-medium">{company.role}</p>
+                <p className="text-sm text-slate-500 mt-1">{company.period}</p>
+                <p className="mt-4 text-slate-600">Click to view projects & responsibilities</p>
               </CardContent>
             </Card>
           </motion.div>
         ))}
       </div>
+
+      {/* Modal */}
+      {activeCompany && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-white max-w-3xl w-full mx-6 rounded-3xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          >
+            <div className="p-8">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-3xl font-bold">{activeCompany.name}</h3>
+                  <p className="text-blue-600 font-medium">{activeCompany.role}</p>
+                  <p className="text-sm text-slate-500">{activeCompany.period}</p>
+                </div>
+                <button
+                  onClick={() => setActiveCompany(null)}
+                  className="text-slate-500 hover:text-slate-800 text-2xl"
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="mt-8 space-y-6">
+                {activeCompany.projects.map((proj, j) => (
+                  <div key={j} className="border-l-4 border-blue-500 pl-4">
+                    <h4 className="text-xl font-semibold mb-2">{proj.title}</h4>
+                    <ul className="list-disc ml-6 space-y-1 text-slate-700">
+                      {proj.responsibilities.map((r, k) => (
+                        <li key={k}>{r}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
     </section>
   );
 }
