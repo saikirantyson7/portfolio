@@ -47,6 +47,69 @@ function Navbar() {
   );
 }
 
+function PreparationBlog() {
+  const posts = [
+    {
+      title: "How I Build a 30-Day Cloud Interview Plan",
+      date: "May 6, 2026",
+      image:
+        "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1400&q=80",
+      excerpt:
+        "A practical week-by-week schedule to prepare for DevOps and Cloud Engineering interviews while balancing project work.",
+      content:
+        "I split preparation into four tracks: fundamentals, hands-on labs, system design, and mock interviews. Each week has one main objective and measurable outcome. I track progress and capture short notes to improve long-term recall."
+    },
+    {
+      title: "Terraform Revision Notes That Actually Stick",
+      date: "May 4, 2026",
+      image:
+        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
+      excerpt:
+        "A lightweight framework for revising Terraform modules, state handling, and practical troubleshooting.",
+      content:
+        "Instead of re-reading full documentation, I focus on high-frequency interview areas: module composition, remote state, drift, and dependencies. Then I run one compact lab for each topic to reinforce concepts quickly."
+    },
+    {
+      title: "Kubernetes Scenarios I Practice Before Tech Rounds",
+      date: "May 1, 2026",
+      image:
+        "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1400&q=80",
+      excerpt:
+        "A curated checklist for pod failures, service routing, autoscaling behavior, and release rollbacks.",
+      content:
+        "I regularly recreate incidents like CrashLoopBackOff, image pull errors, probe failures, and ingress issues in a sandbox cluster. Practicing diagnosis and articulation helps both in interviews and in production operations."
+    }
+  ];
+
+  return (
+    <main className="min-h-screen bg-slate-50">
+      <header className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <p className="uppercase tracking-[0.2em] text-indigo-100 text-sm font-semibold">preparation subdomain</p>
+          <h1 className="text-4xl md:text-5xl font-extrabold mt-4">Preparation Blog</h1>
+          <p className="mt-5 text-lg md:text-xl max-w-3xl text-indigo-50">
+            Notes, strategies, and resources for cloud, DevOps, and architecture interview preparation.
+          </p>
+        </div>
+      </header>
+
+      <section className="max-w-5xl mx-auto py-16 px-6 space-y-10">
+        {posts.map((post) => (
+          <article key={post.title} className="bg-white rounded-3xl overflow-hidden shadow-lg">
+            <img src={post.image} alt={post.title} className="w-full h-64 md:h-80 object-cover" loading="lazy" />
+            <div className="p-8">
+              <p className="text-sm text-slate-500 mb-3">{post.date}</p>
+              <h2 className="text-2xl font-bold text-slate-800 mb-3">{post.title}</h2>
+              <p className="text-slate-700 font-medium">{post.excerpt}</p>
+              <p className="text-slate-600 mt-4 leading-relaxed">{post.content}</p>
+            </div>
+          </article>
+        ))}
+      </section>
+    </main>
+  );
+}
+
 /* -------------------- HOME -------------------- */
 function Home() {
   return (
@@ -344,6 +407,13 @@ function Contact() {
 
 /* -------------------- APP -------------------- */
 export default function App() {
+  const isPreparationSubdomain =
+    typeof window !== "undefined" && window.location.hostname.split(".")[0] === "preparation";
+
+  if (isPreparationSubdomain) {
+    return <PreparationBlog />;
+  }
+
   return (
     <Router>
       <Navbar />
