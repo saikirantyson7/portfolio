@@ -11,7 +11,7 @@ export default function BlogDetail({ post, loading }) {
       {post.imageUrl ? (
         <img src={post.imageUrl} alt={post.title} className="mt-5 h-72 w-full rounded-xl object-cover" />
       ) : null}
-      <div className="prose prose-slate mt-6 max-w-none leading-7 text-slate-700" dangerouslySetInnerHTML={{ __html: post.content }} />
+      <p className="mt-6 whitespace-pre-wrap leading-7 text-slate-700">{post.content}</p>
       <Link to="/blogs" className="mt-8 inline-block text-blue-600 hover:underline">
         ← Back to blogs
       </Link>
