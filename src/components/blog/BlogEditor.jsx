@@ -1,10 +1,20 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const initialForm = { title: "", description: "", content: "", imageUrl: "" };
+
+const FONT_OPTIONS = ["Arial", "Georgia", "Times New Roman", "Courier New", "Verdana"];
+
+const toolbarButtons = [
+  { label: "Bold", wrap: ["<strong>", "</strong>"] },
+  { label: "Italic", wrap: ["<em>", "</em>"] },
+  { label: "Code Block", wrap: ["<pre><code>", "</code></pre>"] }
+];
+
 
 export default function BlogEditor({ post, onSave, saving }) {
   const [formData, setFormData] = useState(initialForm);
   const [errors, setErrors] = useState({});
+  const contentRef = useRef(null);
 
   useEffect(() => {
     setFormData(
@@ -22,6 +32,39 @@ export default function BlogEditor({ post, onSave, saving }) {
   const handleChange = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+
+
+  const applyWrap = (prefix, suffix = "") => {
+    const textarea = contentRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    const selected = formData.content.slice(start, end);
+    const nextContent = `${formData.content.slice(0, start)}${prefix}${selected}${suffix}${formData.content.slice(end)}`;
+
+    setFormData((prev) => ({ ...prev, content: nextContent }));
+
+    requestAnimationFrame(() => {
+      textarea.focus();
+      const cursorStart = start + prefix.length;
+      const cursorEnd = cursorStart + selected.length;
+      textarea.setSelectionRange(cursorStart, cursorEnd);
+    });
+  };
+
+  const applyColorStyle = (cssProp) => {
+    const value = window.prompt(`Enter ${cssProp === "color" ? "text" : "background"} color (e.g. #2563eb):`);
+    if (!value) return;
+    applyWrap(`<span style="${cssProp}:${value};">`, "</span>");
+  };
+
+  const applyFontFamily = () => {
+    const value = window.prompt(`Choose font: ${FONT_OPTIONS.join(", ")}`);
+    if (!value) return;
+    applyWrap(`<span style="font-family:${value};">`, "</span>");
   };
 
   const handleSubmit = (event) => {
@@ -66,7 +109,27 @@ export default function BlogEditor({ post, onSave, saving }) {
         className="w-full rounded-xl border px-4 py-2"
       />
 
+      <div className="rounded-xl border border-slate-200 p-3">
+        <p className="mb-2 text-sm font-medium text-slate-600">Formatting tools</p>
+        <div className="flex flex-wrap gap-2">
+          {toolbarButtons.map((button) => (
+            <button
+              key={button.label}
+              type="button"
+              onClick={() => applyWrap(button.wrap[0], button.wrap[1])}
+              className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100"
+            >
+              {button.label}
+            </button>
+          ))}
+          <button type="button" onClick={() => applyColorStyle("color")} className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100">Text Colour</button>
+          <button type="button" onClick={() => applyColorStyle("background-color")} className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100">BG Colour</button>
+          <button type="button" onClick={applyFontFamily} className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100">Font Family</button>
+        </div>
+      </div>
+
       <textarea
+        ref={contentRef}
         name="content"
         value={formData.content}
         onChange={handleChange}
