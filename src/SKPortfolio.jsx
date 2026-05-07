@@ -6,6 +6,7 @@ import BlogList from "./components/blog/BlogList";
 import BlogDetail from "./components/blog/BlogDetail";
 import BlogEditor from "./components/blog/BlogEditor";
 import AuthModal from "./components/blog/AuthModal";
+import NotFound from "./components/NotFound";
 import { createBlog, getBlogById, getBlogs, updateBlog } from "./services/blogService";
 
 /* -------------------- BASIC UI COMPONENTS -------------------- */
