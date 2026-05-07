@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import BlogList from "./components/blog/BlogList";
 import BlogDetail from "./components/blog/BlogDetail";
 import BlogEditor from "./components/blog/BlogEditor";
@@ -153,6 +154,7 @@ function PreparationBlog() {
           <div className="max-w-5xl mx-auto">
             <p className="uppercase tracking-[0.2em] text-indigo-100 text-sm font-semibold">preparation subdomain</p>
             <h1 className="text-4xl font-extrabold mt-3">Preparation Blog</h1>
+            <p className="mt-3 text-indigo-100">Simple frontend blog demo with password-gated admin editing.</p>
             <div className="mt-5 flex gap-4 text-sm font-semibold">
               <Link to="/blogs" className="underline">Blogs</Link>
               <Link to="/admin" className="underline">Create/Edit</Link>
@@ -166,29 +168,14 @@ function PreparationBlog() {
             <Route path="/blogs" element={<PreparationBlogHome />} />
             <Route path="/blogs/:id" element={<PreparationBlogDetail />} />
             <Route path="/admin" element={<PreparationAdmin />} />
-            <Route path="*" element={<NotFound preparation />} />
           </Routes>
+
+          <p className="mt-10 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            Security note: this uses frontend-only password protection. For production, upgrade to Firebase Auth or JWT-backed server authentication.
+          </p>
         </section>
       </main>
     </Router>
-  );
-}
-
-function NotFound({ preparation = false }) {
-  return (
-    <section className="min-h-[60vh] flex items-center justify-center px-6 py-16 bg-slate-50">
-      <div className="text-center">
-        <p className="text-sm font-semibold tracking-widest text-slate-500">404</p>
-        <h2 className="mt-2 text-4xl font-bold text-slate-800">Page not found</h2>
-        <p className="mt-3 text-slate-600">The page you are looking for does not exist.</p>
-        <Link
-          to={preparation ? "/blogs" : "/"}
-          className="mt-6 inline-block rounded-xl bg-blue-600 px-5 py-2 font-medium text-white"
-        >
-          {preparation ? "Back to blogs" : "Back to home"}
-        </Link>
-      </div>
-    </section>
   );
 }
 
