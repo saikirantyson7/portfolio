@@ -5,3 +5,26 @@
 .section-title {
   @apply text-4xl md:text-5xl font-bold mb-12 text-center text-slate-800;
 }
+
+.blog-code-block,
+.prose pre {
+  position: relative;
+  background-color: #000;
+  color: #22c55e;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.blog-copy-button {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  border: 1px solid #334155;
+  background: #111827;
+  color: #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+}

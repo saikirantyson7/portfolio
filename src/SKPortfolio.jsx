@@ -154,9 +154,8 @@ function PreparationBlog() {
         <header className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-16 px-6">
           <div className="max-w-5xl mx-auto">
             <p className="uppercase tracking-[0.2em] text-indigo-100 text-sm font-semibold">preparation subdomain</p>
-            <h1 className="text-4xl font-extrabold mt-3">Preparation Blog</h1>
-            <p className="mt-3 text-indigo-100">Simple frontend blog demo with password-gated admin editing.</p>
-            <div className="mt-5 flex gap-4 text-sm font-semibold">
+            <h1 className="text-4xl font-extrabold mt-3">Interview Preparations</h1>
+                        <div className="mt-5 flex gap-4 text-sm font-semibold">
               <Link to="/blogs" className="underline">Blogs</Link>
               <Link to="/admin" className="underline">Create/Edit</Link>
             </div>
@@ -171,9 +170,7 @@ function PreparationBlog() {
             <Route path="/admin" element={<PreparationAdmin />} />
           </Routes>
 
-          <p className="mt-10 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            Security note: this uses frontend-only password protection. For production, upgrade to Firebase Auth or JWT-backed server authentication.
-          </p>
+          
         </section>
       </main>
     </Router>
