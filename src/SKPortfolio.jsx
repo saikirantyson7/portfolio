@@ -1,6 +1,11 @@
-import React, { useState } from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import BlogList from "./components/blog/BlogList";
+import BlogDetail from "./components/blog/BlogDetail";
+import BlogEditor from "./components/blog/BlogEditor";
+import AuthModal from "./components/blog/AuthModal";
+import { createBlog, getBlogById, getBlogs, updateBlog } from "./services/blogService";
 
 /* -------------------- BASIC UI COMPONENTS -------------------- */
 function Card({ children, className = "" }) {
@@ -47,66 +52,143 @@ function Navbar() {
   );
 }
 
-function PreparationBlog() {
-  const posts = [
-    {
-      title: "How I Build a 30-Day Cloud Interview Plan",
-      date: "May 6, 2026",
-      image:
-        "https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=1400&q=80",
-      excerpt:
-        "A practical week-by-week schedule to prepare for DevOps and Cloud Engineering interviews while balancing project work.",
-      content:
-        "I split preparation into four tracks: fundamentals, hands-on labs, system design, and mock interviews. Each week has one main objective and measurable outcome. I track progress and capture short notes to improve long-term recall."
-    },
-    {
-      title: "Terraform Revision Notes That Actually Stick",
-      date: "May 4, 2026",
-      image:
-        "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1400&q=80",
-      excerpt:
-        "A lightweight framework for revising Terraform modules, state handling, and practical troubleshooting.",
-      content:
-        "Instead of re-reading full documentation, I focus on high-frequency interview areas: module composition, remote state, drift, and dependencies. Then I run one compact lab for each topic to reinforce concepts quickly."
-    },
-    {
-      title: "Kubernetes Scenarios I Practice Before Tech Rounds",
-      date: "May 1, 2026",
-      image:
-        "https://images.unsplash.com/photo-1484417894907-623942c8ee29?auto=format&fit=crop&w=1400&q=80",
-      excerpt:
-        "A curated checklist for pod failures, service routing, autoscaling behavior, and release rollbacks.",
-      content:
-        "I regularly recreate incidents like CrashLoopBackOff, image pull errors, probe failures, and ingress issues in a sandbox cluster. Practicing diagnosis and articulation helps both in interviews and in production operations."
+function PreparationBlogHome() {
+  const [blogs, setBlogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getBlogs().then((data) => {
+      setBlogs(data);
+      setLoading(false);
+    });
+  }, []);
+
+  return <BlogList blogs={blogs} loading={loading} />;
+}
+
+function PreparationBlogDetail() {
+  const { id } = useParams();
+  const [post, setPost] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getBlogById(id).then((data) => {
+      setPost(data);
+      setLoading(false);
+    });
+  }, [id]);
+
+  return <BlogDetail post={post} loading={loading} />;
+}
+
+function PreparationAdmin() {
+  const navigate = useNavigate();
+  const [blogs, setBlogs] = useState([]);
+  const [selectedId, setSelectedId] = useState("");
+  const [currentPost, setCurrentPost] = useState(null);
+  const [isAuthed, setIsAuthed] = useState(false);
+  const [showModal, setShowModal] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    getBlogs().then(setBlogs);
+  }, []);
+
+  useEffect(() => {
+    if (!selectedId) {
+      setCurrentPost(null);
+      return;
     }
-  ];
+    getBlogById(selectedId).then(setCurrentPost);
+  }, [selectedId]);
+
+  const handleSave = async (data) => {
+    setSaving(true);
+    const today = new Date().toISOString().slice(0, 10);
+
+    if (currentPost) {
+      await updateBlog(currentPost.id, { ...data, date: today });
+    } else {
+      const id = `${data.title.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${Date.now()}`;
+      await createBlog({ id, ...data, date: today });
+    }
+
+    setSaving(false);
+    setSelectedId("");
+    setCurrentPost(null);
+    setBlogs(await getBlogs());
+    navigate("/blogs");
+  };
 
   return (
-    <main className="min-h-screen bg-slate-50">
-      <header className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <p className="uppercase tracking-[0.2em] text-indigo-100 text-sm font-semibold">preparation subdomain</p>
-          <h1 className="text-4xl md:text-5xl font-extrabold mt-4">Preparation Blog</h1>
-          <p className="mt-5 text-lg md:text-xl max-w-3xl text-indigo-50">
-            Notes, strategies, and resources for cloud, DevOps, and architecture interview preparation.
-          </p>
+    <>
+      <AuthModal isOpen={showModal && !isAuthed} onClose={() => navigate("/blogs")} onSuccess={() => { setIsAuthed(true); setShowModal(false); }} />
+      {isAuthed ? (
+        <div className="space-y-4">
+          <div className="rounded-2xl bg-white p-4 shadow">
+            <label className="text-sm font-medium text-slate-700">Edit existing post</label>
+            <select
+              className="mt-2 w-full rounded-xl border px-3 py-2"
+              value={selectedId}
+              onChange={(event) => setSelectedId(event.target.value)}
+            >
+              <option value="">Create new post</option>
+              {blogs.map((blog) => (
+                <option key={blog.id} value={blog.id}>{blog.title}</option>
+              ))}
+            </select>
+          </div>
+          <BlogEditor post={currentPost} onSave={handleSave} saving={saving} />
         </div>
-      </header>
+      ) : null}
+    </>
+  );
+}
 
-      <section className="max-w-5xl mx-auto py-16 px-6 space-y-10">
-        {posts.map((post) => (
-          <article key={post.title} className="bg-white rounded-3xl overflow-hidden shadow-lg">
-            <img src={post.image} alt={post.title} className="w-full h-64 md:h-80 object-cover" loading="lazy" />
-            <div className="p-8">
-              <p className="text-sm text-slate-500 mb-3">{post.date}</p>
-              <h2 className="text-2xl font-bold text-slate-800 mb-3">{post.title}</h2>
-              <p className="text-slate-700 font-medium">{post.excerpt}</p>
-              <p className="text-slate-600 mt-4 leading-relaxed">{post.content}</p>
+function PreparationBlog() {
+  return (
+    <Router>
+      <main className="min-h-screen bg-slate-50">
+        <header className="bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-16 px-6">
+          <div className="max-w-5xl mx-auto">
+            <p className="uppercase tracking-[0.2em] text-indigo-100 text-sm font-semibold">preparation subdomain</p>
+            <h1 className="text-4xl font-extrabold mt-3">Preparation Blog</h1>
+            <div className="mt-5 flex gap-4 text-sm font-semibold">
+              <Link to="/blogs" className="underline">Blogs</Link>
+              <Link to="/admin" className="underline">Create/Edit</Link>
             </div>
-          </article>
-        ))}
-      </section>
-    </main>
+          </div>
+        </header>
+
+        <section className="max-w-5xl mx-auto py-10 px-6">
+          <Routes>
+            <Route path="/" element={<PreparationBlogHome />} />
+            <Route path="/blogs" element={<PreparationBlogHome />} />
+            <Route path="/blogs/:id" element={<PreparationBlogDetail />} />
+            <Route path="/admin" element={<PreparationAdmin />} />
+            <Route path="*" element={<NotFound preparation />} />
+          </Routes>
+        </section>
+      </main>
+    </Router>
+  );
+}
+
+function NotFound({ preparation = false }) {
+  return (
+    <section className="min-h-[60vh] flex items-center justify-center px-6 py-16 bg-slate-50">
+      <div className="text-center">
+        <p className="text-sm font-semibold tracking-widest text-slate-500">404</p>
+        <h2 className="mt-2 text-4xl font-bold text-slate-800">Page not found</h2>
+        <p className="mt-3 text-slate-600">The page you are looking for does not exist.</p>
+        <Link
+          to={preparation ? "/blogs" : "/"}
+          className="mt-6 inline-block rounded-xl bg-blue-600 px-5 py-2 font-medium text-white"
+        >
+          {preparation ? "Back to blogs" : "Back to home"}
+        </Link>
+      </div>
+    </section>
   );
 }
 
@@ -424,6 +506,7 @@ export default function App() {
         <Route path="/projects" element={<Projects />} />
         <Route path="/certifications" element={<Certifications />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
