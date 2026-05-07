@@ -2,18 +2,24 @@ import { useEffect, useRef, useState } from "react";
 
 const initialForm = { title: "", description: "", content: "", imageUrl: "" };
 
-const FONT_OPTIONS = ["Arial", "Georgia", "Times New Roman", "Courier New", "Verdana"];
+const FONT_OPTIONS = ["Arial", "Georgia", "Times New Roman", "Courier New", "Verdana", "Tahoma", "Trebuchet MS"];
+const COLOR_OPTIONS = ["black", "slategray", "red", "blue", "green", "purple", "orange"];
+const BG_COLOR_OPTIONS = ["white", "black", "lightgray", "lightyellow", "lavender", "honeydew", "aliceblue"];
 
 const toolbarButtons = [
   { label: "Bold", wrap: ["<strong>", "</strong>"] },
   { label: "Italic", wrap: ["<em>", "</em>"] },
-  { label: "Code Block", wrap: ["<pre><code>", "</code></pre>"] }
+  { label: "Underline", wrap: ["<u>", "</u>"] },
+  { label: "Bullet Points", wrap: ["<ul><li>", "</li></ul>"] },
+  { label: "Code Block", wrap: ["<pre class=\"blog-code-block\"><code>", "</code></pre>"] }
 ];
-
 
 export default function BlogEditor({ post, onSave, saving }) {
   const [formData, setFormData] = useState(initialForm);
   const [errors, setErrors] = useState({});
+  const [selectedTextColor, setSelectedTextColor] = useState(COLOR_OPTIONS[0]);
+  const [selectedBgColor, setSelectedBgColor] = useState(BG_COLOR_OPTIONS[0]);
+  const [selectedFont, setSelectedFont] = useState(FONT_OPTIONS[0]);
   const contentRef = useRef(null);
 
   useEffect(() => {
@@ -34,8 +40,6 @@ export default function BlogEditor({ post, onSave, saving }) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-
-
   const applyWrap = (prefix, suffix = "") => {
     const textarea = contentRef.current;
     if (!textarea) return;
@@ -55,14 +59,12 @@ export default function BlogEditor({ post, onSave, saving }) {
     });
   };
 
-  const applyColorStyle = (cssProp) => {
-    const value = window.prompt(`Enter ${cssProp === "color" ? "text" : "background"} color (e.g. #2563eb):`);
+  const applyColorStyle = (cssProp, value) => {
     if (!value) return;
     applyWrap(`<span style="${cssProp}:${value};">`, "</span>");
   };
 
-  const applyFontFamily = () => {
-    const value = window.prompt(`Choose font: ${FONT_OPTIONS.join(", ")}`);
+  const applyFontFamily = (value) => {
     if (!value) return;
     applyWrap(`<span style="font-family:${value};">`, "</span>");
   };
@@ -84,13 +86,7 @@ export default function BlogEditor({ post, onSave, saving }) {
     <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl bg-white p-6 shadow">
       <h2 className="text-2xl font-bold text-slate-800">{post ? "Edit Blog" : "Create Blog"}</h2>
 
-      <input
-        name="title"
-        value={formData.title}
-        onChange={handleChange}
-        placeholder="Title"
-        className="w-full rounded-xl border px-4 py-2"
-      />
+      <input name="title" value={formData.title} onChange={handleChange} placeholder="Title" className="w-full rounded-xl border px-4 py-2" />
       {errors.title ? <p className="text-sm text-red-600">{errors.title}</p> : null}
 
       <input
@@ -122,9 +118,66 @@ export default function BlogEditor({ post, onSave, saving }) {
               {button.label}
             </button>
           ))}
-          <button type="button" onClick={() => applyColorStyle("color")} className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100">Text Colour</button>
-          <button type="button" onClick={() => applyColorStyle("background-color")} className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100">BG Colour</button>
-          <button type="button" onClick={applyFontFamily} className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100">Font Family</button>
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedTextColor}
+              onChange={(event) => setSelectedTextColor(event.target.value)}
+              className="rounded-lg border border-slate-300 px-2 py-1 text-sm text-slate-700"
+            >
+              {COLOR_OPTIONS.map((color) => (
+                <option key={color} value={color}>
+                  {color}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => applyColorStyle("color", selectedTextColor)}
+              className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100"
+            >
+              Text Colour
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedBgColor}
+              onChange={(event) => setSelectedBgColor(event.target.value)}
+              className="rounded-lg border border-slate-300 px-2 py-1 text-sm text-slate-700"
+            >
+              {BG_COLOR_OPTIONS.map((color) => (
+                <option key={color} value={color}>
+                  {color}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => applyColorStyle("background-color", selectedBgColor)}
+              className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100"
+            >
+              BG Colour
+            </button>
+          </div>
+          <div className="flex items-center gap-2">
+            <select
+              value={selectedFont}
+              onChange={(event) => setSelectedFont(event.target.value)}
+              className="rounded-lg border border-slate-300 px-2 py-1 text-sm text-slate-700"
+            >
+              {FONT_OPTIONS.map((font) => (
+                <option key={font} value={font}>
+                  {font}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => applyFontFamily(selectedFont)}
+              className="rounded-lg border border-slate-300 px-3 py-1 text-sm text-slate-700 hover:bg-slate-100"
+            >
+              Font Family
+            </button>
+          </div>
         </div>
       </div>
 
