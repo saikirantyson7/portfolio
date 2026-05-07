@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import BlogList from "./components/blog/BlogList";
 import BlogDetail from "./components/blog/BlogDetail";
 import BlogEditor from "./components/blog/BlogEditor";
 import AuthModal from "./components/blog/AuthModal";
 import { createBlog, getBlogById, getBlogs, updateBlog } from "./services/blogService";
-import NotFound from "./components/NotFound";
 
 /* -------------------- BASIC UI COMPONENTS -------------------- */
 function Card({ children, className = "" }) {
@@ -154,6 +154,7 @@ function PreparationBlog() {
           <div className="max-w-5xl mx-auto">
             <p className="uppercase tracking-[0.2em] text-indigo-100 text-sm font-semibold">preparation subdomain</p>
             <h1 className="text-4xl font-extrabold mt-3">Preparation Blog</h1>
+            <p className="mt-3 text-indigo-100">Simple frontend blog demo with password-gated admin editing.</p>
             <div className="mt-5 flex gap-4 text-sm font-semibold">
               <Link to="/blogs" className="underline">Blogs</Link>
               <Link to="/admin" className="underline">Create/Edit</Link>
@@ -167,8 +168,11 @@ function PreparationBlog() {
             <Route path="/blogs" element={<PreparationBlogHome />} />
             <Route path="/blogs/:id" element={<PreparationBlogDetail />} />
             <Route path="/admin" element={<PreparationAdmin />} />
-            <Route path="*" element={<NotFound preparation />} />
           </Routes>
+
+          <p className="mt-10 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+            Security note: this uses frontend-only password protection. For production, upgrade to Firebase Auth or JWT-backed server authentication.
+          </p>
         </section>
       </main>
     </Router>
